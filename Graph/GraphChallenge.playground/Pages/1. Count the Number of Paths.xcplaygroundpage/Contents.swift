@@ -1,0 +1,67 @@
+// Copyright (c) 2019 Razeware LLC
+// For full license & permission details, see LICENSE.markdown.
+/*:
+ # 1. Count the Number of Paths
+ 
+ Write a method to count the number of paths between two vertices in a directed graph.
+ */
+
+//: ![numberOfPaths](numberOfPaths.png)
+extension Graph where Element: Hashable {
+
+    // O(V + E) - V: number of vertices. E: number of edges
+    public func numberOfPaths(from source: Vertex<Element>, to destination: Vertex<Element>) -> Int {
+        var pathCount = 0
+        var visited: Set<Vertex<Element>> = []
+
+        paths(from: source, to: destination, visited: &visited, pathCount: &pathCount)
+
+        return pathCount
+    }
+
+    private func paths(from source: Vertex<Element>,
+                       to destination: Vertex<Element>,
+                       visited: inout Set<Vertex<Element>>,
+                       pathCount: inout Int) {
+        visited.insert(source)
+
+        if source == destination {
+            pathCount += 1
+        } else {
+            edges(from: source).forEach { edge in
+                if !visited.contains(edge.destination) {
+                    paths(from: edge.destination,
+                          to: destination,
+                          visited: &visited,
+                          pathCount: &pathCount)
+                }
+            }
+        }
+
+        visited.remove(source)
+    }
+
+}
+
+
+let graph = AdjacencyList<String>()
+
+let a = graph.createVertex(data: "A")
+let b = graph.createVertex(data: "B")
+let c = graph.createVertex(data: "C")
+let d = graph.createVertex(data: "D")
+let e = graph.createVertex(data: "E")
+
+graph.add(.directed, from: a, to: b, weight: 0)
+graph.add(.directed, from: a, to: d, weight: 0)
+graph.add(.directed, from: a, to: e, weight: 0)
+graph.add(.directed, from: a, to: c, weight: 0)
+graph.add(.directed, from: b, to: d, weight: 0)
+graph.add(.directed, from: b, to: c, weight: 0)
+graph.add(.directed, from: d, to: e, weight: 0)
+graph.add(.directed, from: c, to: e, weight: 0)
+
+print(graph)
+print("Number of paths: \(graph.numberOfPaths(from: a, to: e))") // 5
+
+//: [Next Challenge](@next)
